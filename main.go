@@ -2,12 +2,14 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/ngalert/notifier/channels"
 	"github.com/grafana/grafana/pkg/services/secrets"
 	"github.com/grafana/grafana/pkg/services/secrets/fakes"
 	secretsManager "github.com/grafana/grafana/pkg/services/secrets/manager"
+	"github.com/inconshreveable/log15"
 	"os"
 	"testing"
 
@@ -21,6 +23,8 @@ import (
 )
 
 func main() {
+	log.Root.SetHandler(log15.StreamHandler(os.Stderr, log15.TerminalFormat()))
+
 	slackWebhookURL := os.Getenv("SLACK_WEBHOOK_URL")
 
 	if slackWebhookURL == "" {
@@ -36,44 +40,48 @@ func main() {
 
 	cases := []struct {
 		name     string
-		settings string
+		settings validator.SlackSetting
 		alerts   []*types.Alert
 	}{
 		{
 			name: "Correct config with one alert",
-			settings: `{
-				"token": "1234",
-				"recipient": "#testchannel",
-				"icon_emoji": ":emoji:"
-			}`,
+			settings: validator.SlackSetting{
+				Title:     `{{ template "my.title" . }}`,
+				Text:      `{{ template "my.message" . }}`,
+				Token:     "1234",
+				Recipient: "#testchannel",
+				IconEmoji: ":emoji:",
+			},
 			alerts: []*types.Alert{
 				{
 					Alert: model.Alert{
 						Labels:      model.LabelSet{"alertname": "single_alert1", "lbl1": "val1"},
-						Annotations: model.LabelSet{"ann1": "annv1", "__dashboardUid__": "abcd", "__panelId__": "efgh"},
+						Annotations: model.LabelSet{"ann1": "annv1", "__dashboardUid__": "abcd", "__panelId__": "efgh", "summary": "Correct config with one alert"},
 					},
 				},
 			},
 		},
 		{
-			name: "Correct config with multiple alerts and template",
-			settings: `{
-				"token": "1234",
-				"recipient": "#testchannel",
-				"icon_emoji": ":emoji:",
-				"title": "🔥firing {{ .Alerts.Firing | len }}, ✅resolved {{ .Alerts.Resolved | len }}"
-			}`,
+			name: "Correct config with multiple alerts and custom title template",
+			settings: validator.SlackSetting{
+				//Title: `{{ template "my.title" . }}`,
+				Title:     `firing {{ .Alerts.Firing | len }}, resolved {{ .Alerts.Resolved | len }}`,
+				Text:      `{{ template "my.message" . }}`,
+				Token:     "1234",
+				Recipient: "#testchannel",
+				IconEmoji: ":emoji:",
+			},
 			alerts: []*types.Alert{
 				{
 					Alert: model.Alert{
 						Labels:      model.LabelSet{"alertname": "multi_alert1", "lbl1": "val1"},
-						Annotations: model.LabelSet{"ann1": "annv1"},
+						Annotations: model.LabelSet{"ann1": "annv1", "summary": "multiple alerts 1/2"},
 					},
 				},
 				{
 					Alert: model.Alert{
 						Labels:      model.LabelSet{"alertname": "multi_alert2", "lbl1": "val2"},
-						Annotations: model.LabelSet{"ann1": "annv2"},
+						Annotations: model.LabelSet{"ann1": "annv2", "summary": "multiple alerts 2/2"},
 					},
 				},
 			},
@@ -82,7 +90,10 @@ func main() {
 
 	t := &testing.T{}
 	for _, c := range cases {
-		settingsJSON, err := simplejson.NewJson([]byte(c.settings))
+		settingsJson, err := json.Marshal(c.settings)
+		validator.ErrPanic(err)
+
+		settingsSimpleJSON, err := simplejson.NewJson(settingsJson)
 		validator.ErrPanic(err)
 
 		secretsService := secretsManager.SetupTestService(t, fakes.NewFakeSecretsStore())
@@ -95,7 +106,7 @@ func main() {
 		m := &channels.NotificationChannelConfig{
 			Name:           "slack_testing",
 			Type:           "slack",
-			Settings:       settingsJSON,
+			Settings:       settingsSimpleJSON,
 			SecureSettings: secureSettings,
 		}
 

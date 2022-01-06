@@ -11,6 +11,14 @@ import (
 	"time"
 )
 
+type SlackSetting struct {
+	Title     string `json:"title"`
+	Text      string `json:"text"`
+	Token     string `json:"token"`
+	Recipient string `json:"recipient"`
+	IconEmoji string `json:"icon_emoji"`
+}
+
 // sendSlackRequest sends a request to the Slack API.
 // Stubbable by tests.
 var SendSlackRequest = func(request *http.Request, logger log.Logger) error {
