@@ -38,22 +38,23 @@ func main() {
 		name     string
 		settings string
 		alerts   []*types.Alert
-	}{{
-		name: "Correct config with one alert",
-		settings: `{
+	}{
+		{
+			name: "Correct config with one alert",
+			settings: `{
 				"token": "1234",
 				"recipient": "#testchannel",
 				"icon_emoji": ":emoji:"
 			}`,
-		alerts: []*types.Alert{
-			{
-				Alert: model.Alert{
-					Labels:      model.LabelSet{"alertname": "alert1", "lbl1": "val1"},
-					Annotations: model.LabelSet{"ann1": "annv1", "__dashboardUid__": "abcd", "__panelId__": "efgh"},
+			alerts: []*types.Alert{
+				{
+					Alert: model.Alert{
+						Labels:      model.LabelSet{"alertname": "single_alert1", "lbl1": "val1"},
+						Annotations: model.LabelSet{"ann1": "annv1", "__dashboardUid__": "abcd", "__panelId__": "efgh"},
+					},
 				},
 			},
 		},
-	},
 		{
 			name: "Correct config with multiple alerts and template",
 			settings: `{
@@ -65,13 +66,13 @@ func main() {
 			alerts: []*types.Alert{
 				{
 					Alert: model.Alert{
-						Labels:      model.LabelSet{"alertname": "alert1", "lbl1": "val1"},
+						Labels:      model.LabelSet{"alertname": "multi_alert1", "lbl1": "val1"},
 						Annotations: model.LabelSet{"ann1": "annv1"},
 					},
 				},
 				{
 					Alert: model.Alert{
-						Labels:      model.LabelSet{"alertname": "alert2", "lbl1": "val2"},
+						Labels:      model.LabelSet{"alertname": "multi_alert2", "lbl1": "val2"},
 						Annotations: model.LabelSet{"ann1": "annv2"},
 					},
 				},
@@ -123,6 +124,5 @@ func main() {
 		ctx = notify.WithGroupLabels(ctx, model.LabelSet{"alertname": ""})
 		_, err = pn.Notify(ctx, c.alerts...)
 		validator.ErrPanic(err)
-
 	}
 }
