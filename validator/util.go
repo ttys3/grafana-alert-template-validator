@@ -19,7 +19,6 @@ const TemplateForTestsString = `
 
 {{- range . }}
 
-*Summary*: {{ .Annotations.summary }}
 *Annotations*:
 {{ range .Annotations.SortedPairs }}	- {{ .Name }} = {{ .Value }}
 {{ end }}
