@@ -11,8 +11,9 @@ import (
 // will require updating almost all channel tests (15+ files) and it's very time consuming.
 const TemplateForTestsString = `
 {{/* begin my title template mod from default.title */}}
-{{ define "default.title" }}[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ (index .Alerts 0).Annotations.summary }}{{ end }}
+{{ define "my.title" }} [{{ .Alerts.Firing | len }} firing, {{ .Alerts.Resolved | len }} resolved] {{ (index .Alerts 0).Annotations.summary }}{{ end }}
 {{/* end my.title */}}
+
 {{/* begin define my.message template mod from default.message */}}
 {{ define "my__text_alert_list" }}{{ range . }}
 
