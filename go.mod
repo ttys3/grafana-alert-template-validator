@@ -3,11 +3,10 @@ module github.com/ttys3/grafana-alert-template-validator
 go 1.17
 
 require (
+	github.com/grafana/grafana v1.9.2-0.20220105205555-20b3b2a448fd
 	github.com/prometheus/alertmanager v0.23.1-0.20211116083607-e2a10119aaf7
 	github.com/prometheus/common v0.32.1
 )
-
-require github.com/grafana/grafana v1.9.2-0.20220105205555-20b3b2a448fd
 
 require (
 	github.com/VividCortex/mysqlerr v0.0.0-20170204212430-6c6b55f8796f // indirect
