@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/grafana/grafana v1.9.2-0.20220105205555-20b3b2a448fd
+	github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec
 	github.com/prometheus/alertmanager v0.23.1-0.20211116083607-e2a10119aaf7
 	github.com/prometheus/common v0.32.1
 )
@@ -46,7 +47,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/memberlist v0.2.4 // indirect
 	github.com/hashicorp/yamux v0.0.0-20210826001029-26ff87cf9493 // indirect
-	github.com/inconshreveable/log15 v0.0.0-20180818164646-67afb5ed74ec // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -92,7 +92,7 @@ require (
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 	xorm.io/builder v0.3.6 // indirect
 	xorm.io/core v0.7.3 // indirect
 	xorm.io/xorm v0.8.2 // indirect
